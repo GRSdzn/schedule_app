@@ -5,7 +5,8 @@ import 'package:schedule_app/app/router/scaffold_with_nested_navigation.dart';
 import 'package:schedule_app/bloc/group_teacher_bloc/group_teacher_bloc_bloc.dart';
 import 'package:schedule_app/data/repo/group_teacher_repo.dart';
 import 'package:schedule_app/presentation/screens/home_screen.dart';
-import 'package:schedule_app/presentation/screens/shedule_screen.dart'; // Fixed import path
+import 'package:schedule_app/presentation/screens/shedule_screen.dart';
+import 'package:schedule_app/presentation/screens/splash_screen.dart'; // Fixed import path
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorAKey =
@@ -13,17 +14,15 @@ final _shellNavigatorAKey =
 final _shellNavigatorBKey =
     GlobalKey<NavigatorState>(debugLabel: 'ScheduleScreenShell');
 
-// The one and only GoRouter instance
 final goRouter = GoRouter(
-  initialLocation: '/', // Set this to your preferred initial route
+  initialLocation: '/',
   navigatorKey: _rootNavigatorKey,
-  routes: [
+  routes: <RouteBase>[
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
       },
       branches: [
-        // First branch (A)
         StatefulShellBranch(
           navigatorKey: _shellNavigatorAKey,
           routes: [
@@ -45,7 +44,6 @@ final goRouter = GoRouter(
             ),
           ],
         ),
-        // Second branch (B)
         StatefulShellBranch(
           navigatorKey: _shellNavigatorBKey,
           routes: [
@@ -53,8 +51,7 @@ final goRouter = GoRouter(
               path: '/schedule',
               pageBuilder: (context, state) {
                 return const NoTransitionPage(
-                  child: ScheduleScreen(
-                      title: 'Schedule'), // Updated screen instantiation
+                  child: ScheduleScreen(title: 'Schedule'),
                 );
               },
             ),
