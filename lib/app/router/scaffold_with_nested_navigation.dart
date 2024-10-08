@@ -7,15 +7,12 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
     required this.navigationShell,
   }) : super(
             key: key ?? const ValueKey<String>('ScaffoldWithNestedNavigation'));
+
   final StatefulNavigationShell navigationShell;
 
   void _goBranch(int index) {
     navigationShell.goBranch(
       index,
-      // A common pattern when using bottom navigation bars is to support
-      // navigating to the initial location when tapping the item that is
-      // already active. This example demonstrates how to support this behavior,
-      // using the initialLocation parameter of goBranch.
       initialLocation: index == navigationShell.currentIndex,
     );
   }
@@ -23,7 +20,6 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      // layout breakpoint: tweak as needed
       if (constraints.maxWidth < 450) {
         return ScaffoldWithNavigationBar(
           body: navigationShell,
@@ -43,11 +39,11 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
 
 class ScaffoldWithNavigationBar extends StatelessWidget {
   const ScaffoldWithNavigationBar({
-    super.key,
+    Key? key,
     required this.body,
     required this.selectedIndex,
     required this.onDestinationSelected,
-  });
+  }) : super(key: key);
 
   final Widget body;
   final int selectedIndex;
@@ -69,14 +65,14 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
   }
 }
 
-// Dummy class for NavigationRail to avoid errors
 class ScaffoldWithNavigationRail extends StatelessWidget {
   const ScaffoldWithNavigationRail({
-    super.key,
+    Key? key,
     required this.body,
     required this.selectedIndex,
     required this.onDestinationSelected,
-  });
+  }) : super(key: key);
+
   final Widget body;
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
@@ -86,7 +82,6 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          // Fixed navigation rail on the left (start)
           NavigationRail(
             selectedIndex: selectedIndex,
             onDestinationSelected: onDestinationSelected,
@@ -103,7 +98,6 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
             ],
           ),
           const VerticalDivider(thickness: 1, width: 1),
-          // Main content on the right (end)
           Expanded(
             child: body,
           ),
