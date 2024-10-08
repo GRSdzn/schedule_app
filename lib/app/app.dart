@@ -10,11 +10,11 @@ class MainApp extends StatelessWidget {
       title: 'Flutter test',
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
-      debugShowMaterialGrid: false,
-      checkerboardRasterCacheImages: false,
-      showPerformanceOverlay: false,
-      checkerboardOffscreenLayers: false,
-      showSemanticsDebugger: false,
+      // debugShowMaterialGrid: false,
+      // checkerboardRasterCacheImages: false,
+      // showPerformanceOverlay: false,
+      // checkerboardOffscreenLayers: false,
+      // showSemanticsDebugger: false,
     );
   }
 }

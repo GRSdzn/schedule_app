@@ -21,11 +21,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // Выравнивание по центру
           children: [
-            const Text('Schedule'),
+            const Text('Settings'),
             ElevatedButton(
               onPressed: () {
                 // Возврат на главный экран
-                GoRouter.of(context).go('/');
+                GoRouter.of(context).go('/select-item');
               },
               child: const Text('Список'), // Улучшен текст кнопки
             ),
