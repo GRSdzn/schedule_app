@@ -8,7 +8,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Flutter test',
-      routerConfig: mainRouter,
+      routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       checkerboardRasterCacheImages: false,

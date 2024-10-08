@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'dart:io';
@@ -19,8 +20,7 @@ class GroupTeacherRepo {
     try {
       Response response = await client.get(Uri.parse(endpoint)).timeout(
           const Duration(
-              seconds:
-                  10)); // Используйте timeout для ограничения времени ожидания ответа
+              seconds: 10)); //  timeout для ограничения времени ожидания ответа
 
       if (response.statusCode == 200) {
         // Декодировать тело ответа как UTF-8
@@ -37,12 +37,18 @@ class GroupTeacherRepo {
           }
         }).toList();
       } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
-        print('Response body: ${response.body}');
+        if (kDebugMode) {
+          print('Error: ${response.statusCode} - ${response.reasonPhrase}');
+        }
+        if (kDebugMode) {
+          print('Response body: ${response.body}');
+        }
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      print('Network error: $e');
+      if (kDebugMode) {
+        print('Network error: $e');
+      }
       throw Exception('Network error: $e');
     } finally {
       client.close();
