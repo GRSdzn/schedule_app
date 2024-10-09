@@ -41,6 +41,8 @@ class _LaunchSplashScreenState extends State<LaunchSplashScreen> {
                     itemCount: state.groupTeachers.length,
                     itemBuilder: (context, index) {
                       return ListTile(
+                        onTap: () => print(
+                            'Group teacher tapped: ${state.groupTeachers[index].name}'),
                         title: Text(state.groupTeachers[index].name),
                       );
                     },
