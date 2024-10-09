@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:schedule_app/app/router/scaffold_with_nested_navigation.dart';
 import 'package:schedule_app/bloc/group_teacher_bloc/group_teacher_bloc_bloc.dart';
-import 'package:schedule_app/data/repo/group_teacher_repo.dart';
+import 'package:schedule_app/data/repository/group_teacher_repo.dart';
 import 'package:schedule_app/presentation/screens/home_screen.dart';
 import 'package:schedule_app/presentation/screens/settings_screen.dart';
 import 'package:schedule_app/presentation/screens/splash_screen.dart';
@@ -14,6 +14,8 @@ final _shellNavigatorAKey =
 final _shellNavigatorBKey =
     GlobalKey<NavigatorState>(debugLabel: 'ScheduleScreenShell');
 
+final groupTeacherRepo = GroupTeacherRepo();
+
 final goRouter = GoRouter(
   initialLocation: '/',
   navigatorKey: _rootNavigatorKey,
@@ -23,8 +25,8 @@ final goRouter = GoRouter(
       path: '/',
       pageBuilder: (context, state) {
         return NoTransitionPage(
-          child: RepositoryProvider(
-            create: (context) => GroupTeacherRepo(),
+          child: RepositoryProvider.value(
+            value: groupTeacherRepo,
             child: BlocProvider(
               create: (context) => GroupTeacherBloc(
                 RepositoryProvider.of<GroupTeacherRepo>(context),
