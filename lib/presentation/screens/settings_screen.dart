@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key, required this.title});
-
-  final String title;
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<ScheduleScreen> createState() => _ScheduleScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('Settings'),
       ),
       body: Center(
         child: Column(

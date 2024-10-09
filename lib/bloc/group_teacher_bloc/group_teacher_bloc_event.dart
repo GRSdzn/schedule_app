@@ -19,3 +19,12 @@ class SelectGroupTeacherEvent extends GroupTeacherBlocEvent {
   @override
   List<Object> get props => [selectedTeacher];
 }
+
+class LoadLessonsEvent extends GroupTeacherBlocEvent {
+  final GroupTeacherModel selectedTeacher;
+
+  const LoadLessonsEvent(this.selectedTeacher);
+
+  @override
+  List<Object> get props => [selectedTeacher];
+}

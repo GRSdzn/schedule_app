@@ -39,3 +39,13 @@ class GroupTeacherError extends GroupTeacherBlocState {
   @override
   List<Object?> get props => [message];
 }
+
+// unknown state
+class GroupTeacherLessonsLoaded extends GroupTeacherBlocState {
+  final ScheduleModel lessons;
+
+  GroupTeacherLessonsLoaded(this.lessons);
+
+  @override
+  List<Object> get props => [lessons];
+}

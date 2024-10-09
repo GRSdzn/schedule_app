@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:schedule_app/app/router/scaffold_with_nested_navigation.dart';
 import 'package:schedule_app/bloc/group_teacher_bloc/group_teacher_bloc_bloc.dart';
 import 'package:schedule_app/data/repository/group_teacher_repo.dart';
-import 'package:schedule_app/presentation/screens/home_screen.dart';
+import 'package:schedule_app/presentation/screens/schedule_screen.dart';
 import 'package:schedule_app/presentation/screens/settings_screen.dart';
 import 'package:schedule_app/presentation/screens/splash_screen.dart';
 
@@ -46,8 +46,8 @@ final goRouter = GoRouter(
           navigatorKey: _shellNavigatorAKey,
           routes: [
             GoRoute(
-              name: 'Home',
-              path: '/home',
+              name: 'Schedule',
+              path: '/schedule',
               pageBuilder: (context, state) {
                 return NoTransitionPage(
                   child: RepositoryProvider(
@@ -56,7 +56,7 @@ final goRouter = GoRouter(
                       create: (context) => GroupTeacherBloc(
                         RepositoryProvider.of<GroupTeacherRepo>(context),
                       )..add(LoadGroupTeacherBlocEvent()),
-                      child: const HomeScreen(),
+                      child: const ScheduleScreen(),
                     ),
                   ),
                 );
@@ -68,10 +68,11 @@ final goRouter = GoRouter(
           navigatorKey: _shellNavigatorBKey,
           routes: [
             GoRoute(
-              path: '/schedule',
+              name: 'Settings',
+              path: '/settings',
               pageBuilder: (context, state) {
                 return const NoTransitionPage(
-                  child: ScheduleScreen(title: 'Schedule'),
+                  child: SettingsScreen(),
                 );
               },
             ),
