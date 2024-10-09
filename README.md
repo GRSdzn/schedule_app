@@ -1,6 +1,6 @@
 # schedule_app
 
-A new Flutter project.
+A Flutter project for get schedule from api.
 
 ## Getting Started
 
