@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'dart:io';
 import 'package:schedule_app/data/models/group_teacher_model.dart';
@@ -33,6 +32,7 @@ class GroupTeacherRepo implements GroupTeacherRepoInterface {
     }
   }
 
+  @override
   Future<Map<String, dynamic>> getLessonsForGroupTeacher(
       String groupName) async {
     final lessonsEndpoint =

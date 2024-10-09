@@ -7,7 +7,7 @@ import 'package:schedule_app/data/models/schedule_model.dart';
 import '../../utils/cache_manager.dart';
 
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key});
+  const ScheduleScreen({Key? key}) : super(key: key);
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -19,13 +19,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
+    _loadSelectedTeacher();
   }
 
   @override
   Widget build(BuildContext context) {
+    print(selectedTeacher?.name);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Расписание группы ${selectedTeacher?.name ?? ''}"),
+        title: BlocBuilder<GroupTeacherBloc, GroupTeacherBlocState>(
+          builder: (context, state) {
+            if (state is GroupTeacherLessonsLoaded) {
+              return Text("Расписание группы ${state.selectedTeacher.name}");
+            }
+            // reutnr null if state is loading
+            return const SizedBox.shrink();
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -38,71 +48,58 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
       body: BlocBuilder<GroupTeacherBloc, GroupTeacherBlocState>(
         builder: (context, state) {
-          if (state is GroupTeacherLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is GroupTeacherLessonsLoaded) {
-            selectedTeacher = state.selectedTeacher;
-            return _buildLessonsList(state.lessons);
-          }
-
-          if (state is GroupTeacherError) {
-            return Center(
-              child: Text('Ошибка загрузки расписания: ${state.message}'),
-            );
-          }
-
-          if (state is GroupTeacherLoaded) {
-            _loadSelectedTeacher(state);
-            return _buildGroupTeacherList(state);
-          }
-
-          return const Center(child: Text('Неизвестное состояние'));
+          return Stack(
+            children: [
+              _buildMainContent(state),
+              if (state is GroupTeacherLoading)
+                const Center(
+                    child: CircularProgressIndicator()), // Индикатор загрузки
+            ],
+          );
         },
       ),
     );
   }
 
-  void _loadSelectedTeacher(GroupTeacherLoaded state) async {
+  void _loadSelectedTeacher() async {
     final selectedTeacherData = await CacheManager.getSelectedGroupTeacher();
     if (selectedTeacherData != null) {
-      final teacher = state.groupTeachers.firstWhere(
-        (teacher) => teacher.name == selectedTeacherData['name'],
-      );
+      final bloc = context.read<GroupTeacherBloc>();
+      bloc.add(
+          LoadGroupTeacherBlocEvent()); // Запрос на загрузку преподавателей
+      final selectedTeacher = await CacheManager.getSelectedGroupTeacher();
 
-      if (teacher != null) {
-        setState(() {
-          selectedTeacher = teacher; // Устанавливаем выбранного преподавателя
-        });
-        context.read<GroupTeacherBloc>().add(
-            LoadLessonsEvent(teacher)); // Загружаем уроки для нового учителя
-      }
+      // Используем listen для определения состояния, чтобы загрузить уроки в случае успеха
+      bloc.stream.listen((state) {
+        if (state is GroupTeacherLoaded) {
+          this.selectedTeacher = state.groupTeachers.firstWhere(
+            (teacher) => teacher.name == selectedTeacherData['name'],
+            orElse: null,
+          );
+
+          if (this.selectedTeacher != null) {
+            bloc.add(LoadLessonsEvent(
+                this.selectedTeacher!)); // Запрос на загрузку уроков
+          }
+        }
+      });
     }
   }
 
-  Widget _buildGroupTeacherList(GroupTeacherLoaded state) {
-    return Column(
-      children: [
-        if (state.groupTeachers.isNotEmpty) ...[
-          ListTile(
-            title: Text(
-              'Выбранный преподаватель: ${selectedTeacher?.name ?? "Не выбран"}',
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                GoRouter.of(context)
-                    .go('/'); // Смена маршрута для выбора преподавателя
-              },
-            ),
-          ),
-          const Divider(),
-        ],
-        const SizedBox(height: 20),
-        const Expanded(child: Center(child: Text('Загрузка уроков...'))),
-      ],
-    );
+  Widget _buildMainContent(GroupTeacherBlocState state) {
+    if (state is GroupTeacherLessonsLoaded) {
+      return _buildLessonsList(state.lessons);
+    }
+    if (state is GroupTeacherError) {
+      return Center(
+          child: Text('Ошибка загрузки расписания: ${state.message}'));
+    }
+    if (state is GroupTeacherLoading || state is GroupTeacherLoaded) {
+      return const Center(
+          child: Text('Загрузка расписания. Пожалуйста, подождите.'));
+    }
+
+    return const Center(child: Text('Неизвестное состояние'));
   }
 
   Widget _buildLessonsList(ScheduleModel lessons) {
@@ -114,17 +111,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       itemCount: lessons.weeks!.length,
       itemBuilder: (context, weekIndex) {
         final week = lessons.weeks![weekIndex];
-
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Неделя: ${week.id}',
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              Text('Неделя: ${week.id}',
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               ...week.days!.map<Widget>((day) {
                 return Column(
@@ -161,7 +155,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       itemBuilder: (context, pairIndex) {
         final pair = day.pairs![pairIndex];
 
-        // Проверяем наличие названия уроков
         if (pair.lessons != null && pair.lessons!.isNotEmpty) {
           return Card(
             margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -175,8 +168,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             ),
           );
         }
-
-        // Если у урока нет названия, возвращаем SizedBox, чтобы не отображать ничего
         return const SizedBox.shrink();
       },
     );
