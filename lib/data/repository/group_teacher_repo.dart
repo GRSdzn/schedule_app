@@ -10,35 +10,23 @@ class GroupTeacherRepo implements GroupTeacherRepoInterface {
 
   @override
   Future<List<GroupTeacherModel>> getGroupTeacher() async {
-    HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-
-    Client client = IOClient(httpClient);
+    final client = IOClient(
+        HttpClient()..badCertificateCallback = (cert, host, port) => true);
 
     try {
-      Response response = await client
+      final response = await client
           .get(Uri.parse(endpoint))
           .timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
-        final utf8Response = utf8.decode(response.bodyBytes);
-        final List<dynamic> jsonResponse = jsonDecode(utf8Response);
-
-        return jsonResponse.map((e) {
-          if (e is Map<String, dynamic>) {
-            return GroupTeacherModel.fromJson(e);
-          } else {
-            throw Exception('Expected JSON object but got: $e');
-          }
-        }).toList();
-      } else {
-        print(
-            'Request failed with status: ${response.statusCode} and body: ${response.body}');
+      if (response.statusCode != 200) {
         throw Exception('Failed to load data: ${response.statusCode}');
       }
+
+      final utf8Response = utf8.decode(response.bodyBytes);
+      final List<dynamic> jsonResponse = jsonDecode(utf8Response);
+
+      return jsonResponse.map((e) => GroupTeacherModel.fromJson(e)).toList();
     } catch (e) {
-      print('Network error: $e');
       throw Exception('Network error: $e');
     } finally {
       client.close();
@@ -47,38 +35,23 @@ class GroupTeacherRepo implements GroupTeacherRepoInterface {
 
   Future<Map<String, dynamic>> getLessonsForGroupTeacher(
       String groupName) async {
-    final String lessonsEndpoint =
+    final lessonsEndpoint =
         'https://rasp-api.rsue.ru/api/v1/schedule/lessons/$groupName/';
+    final client = IOClient(
+        HttpClient()..badCertificateCallback = (cert, host, port) => true);
 
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-
-    final Client client = IOClient(httpClient);
-    print("groupName $groupName");
     try {
-      Response response = await client
+      final response = await client
           .get(Uri.parse(lessonsEndpoint))
           .timeout(const Duration(seconds: 10));
 
-      // Логирование кода состояния
-      print('Lessons request status code: ${response.statusCode}');
-
-      // Логирование содержимого ответа
-      print('Lessons request body: ${response.body}');
-      print("groupName $groupName");
-
-      if (response.statusCode == 200) {
-        final utf8Response = utf8.decode(response.bodyBytes);
-        final Map<String, dynamic> jsonResponse = jsonDecode(utf8Response);
-        return jsonResponse; // Возвращаем данные о занятиях
-      } else {
-        print(
-            'Error: Failed to load lessons with status code: ${response.statusCode} and body: ${response.body}');
+      if (response.statusCode != 200) {
         throw Exception('Failed to load lessons: ${response.statusCode}');
       }
+
+      final utf8Response = utf8.decode(response.bodyBytes);
+      return jsonDecode(utf8Response);
     } catch (e) {
-      print('Network error: $e');
       throw Exception('Network error: $e');
     } finally {
       client.close();

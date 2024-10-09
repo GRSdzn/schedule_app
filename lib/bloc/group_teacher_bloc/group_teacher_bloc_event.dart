@@ -1,15 +1,13 @@
-// group_teacher_bloc_event.dart
 part of 'group_teacher_bloc_bloc.dart';
 
-@immutable
 abstract class GroupTeacherBlocEvent extends Equatable {
   const GroupTeacherBlocEvent();
+
+  @override
+  List<Object?> get props => [];
 }
 
-class LoadGroupTeacherBlocEvent extends GroupTeacherBlocEvent {
-  @override
-  List<Object> get props => [];
-}
+class LoadGroupTeacherBlocEvent extends GroupTeacherBlocEvent {}
 
 class SelectGroupTeacherEvent extends GroupTeacherBlocEvent {
   final GroupTeacherModel selectedTeacher;
@@ -17,7 +15,7 @@ class SelectGroupTeacherEvent extends GroupTeacherBlocEvent {
   const SelectGroupTeacherEvent(this.selectedTeacher);
 
   @override
-  List<Object> get props => [selectedTeacher];
+  List<Object?> get props => [selectedTeacher];
 }
 
 class LoadLessonsEvent extends GroupTeacherBlocEvent {
@@ -26,5 +24,5 @@ class LoadLessonsEvent extends GroupTeacherBlocEvent {
   const LoadLessonsEvent(this.selectedTeacher);
 
   @override
-  List<Object> get props => [selectedTeacher];
+  List<Object?> get props => [selectedTeacher];
 }

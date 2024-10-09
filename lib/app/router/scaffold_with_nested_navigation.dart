@@ -39,11 +39,11 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
 
 class ScaffoldWithNavigationBar extends StatelessWidget {
   const ScaffoldWithNavigationBar({
-    Key? key,
+    super.key,
     required this.body,
     required this.selectedIndex,
     required this.onDestinationSelected,
-  }) : super(key: key);
+  });
 
   final Widget body;
   final int selectedIndex;
@@ -56,8 +56,8 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         destinations: const [
-          NavigationDestination(label: 'Section A', icon: Icon(Icons.home)),
-          NavigationDestination(label: 'Section B', icon: Icon(Icons.settings)),
+          NavigationDestination(label: 'Главная', icon: Icon(Icons.home)),
+          NavigationDestination(label: 'Настройки', icon: Icon(Icons.settings)),
         ],
         onDestinationSelected: onDestinationSelected,
       ),
@@ -67,11 +67,11 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
 
 class ScaffoldWithNavigationRail extends StatelessWidget {
   const ScaffoldWithNavigationRail({
-    Key? key,
+    super.key,
     required this.body,
     required this.selectedIndex,
     required this.onDestinationSelected,
-  }) : super(key: key);
+  });
 
   final Widget body;
   final int selectedIndex;

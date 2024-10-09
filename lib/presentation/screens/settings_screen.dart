@@ -15,18 +15,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // Выравнивание по центру
           children: [
-            const Text('Settings'),
-            ElevatedButton(
-              onPressed: () {
-                // Возврат на главный экран
-                GoRouter.of(context).go('/select-item');
-              },
-              child: const Text('Список'), // Улучшен текст кнопки
-            ),
+            Text('В разработке...'),
           ],
         ),
       ),

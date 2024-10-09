@@ -1,9 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 import 'package:schedule_app/data/models/group_teacher_model.dart';
 import 'package:schedule_app/data/models/schedule_model.dart';
-import 'package:schedule_app/utils/cache_manager.dart'; // Импортируйте CacheManager
+import 'package:schedule_app/utils/cache_manager.dart';
 import 'package:schedule_app/domain/repository/group_teacher_repo_interface.dart';
 
 part 'group_teacher_bloc_event.dart';
@@ -17,7 +16,6 @@ class GroupTeacherBloc
       : super(GroupTeacherLoading()) {
     on<LoadGroupTeacherBlocEvent>((event, emit) async {
       emit(GroupTeacherLoading());
-
       try {
         final groupTeachers = await _groupTeacherRepository.getGroupTeacher();
         emit(GroupTeacherLoaded(groupTeachers));
@@ -26,12 +24,10 @@ class GroupTeacherBloc
       }
     });
 
-    on<SelectGroupTeacherEvent>((event, emit) {
+    on<SelectGroupTeacherEvent>((event, emit) async {
       emit(GroupTeacherSelected(event.selectedTeacher));
-
-      // Сохраните выбранного преподавателя в кэше upd: нужно сделать чтобы если пользователь выбирает другого, то перезаписывать данные
-      // CacheManager.saveSelectedGroupTeacher(
-      //     event.selectedTeacher.id, event.selectedTeacher.name);
+      await CacheManager.saveSelectedGroupTeacher(
+          event.selectedTeacher.id, event.selectedTeacher.name);
     });
 
     on<LoadLessonsEvent>((event, emit) async {
@@ -42,8 +38,8 @@ class GroupTeacherBloc
             .getLessonsForGroupTeacher(selectedTeacherName);
         final scheduleModel = ScheduleModel.fromJson(lessonsData);
 
-        emit(GroupTeacherLessonsLoaded(
-            scheduleModel)); // проверьте, что передаете ScheduleModel
+        emit(GroupTeacherLessonsLoaded(scheduleModel,
+            event.selectedTeacher)); // передаем выбранного преподавателя
       } catch (e) {
         emit(GroupTeacherError(e.toString()));
       }

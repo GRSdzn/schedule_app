@@ -11,10 +11,10 @@ class CacheManager {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final id = prefs.getInt('selected_group_teacher_id');
     final name = prefs.getString('selected_group_teacher_name');
-
+    print('cached id: $id, name: $name');
     if (id != null && name != null) {
       return {'id': id, 'name': name};
     }
-    return null; // Если данных нет
+    return null;
   }
 }
