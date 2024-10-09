@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +8,7 @@ import 'package:schedule_app/data/models/schedule_model.dart';
 import '../../utils/cache_manager.dart';
 
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({Key? key}) : super(key: key);
+  const ScheduleScreen({super.key});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -24,13 +25,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedTeacher?.name);
+    if (kDebugMode) {
+      print(selectedTeacher?.name);
+    }
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<GroupTeacherBloc, GroupTeacherBlocState>(
           builder: (context, state) {
             if (state is GroupTeacherLessonsLoaded) {
-              return Text("Расписание группы ${state.selectedTeacher.name}");
+              return Text("Расписание ${state.selectedTeacher.name}");
             }
             // reutnr null if state is loading
             return const SizedBox.shrink();
@@ -64,25 +67,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   void _loadSelectedTeacher() async {
     final selectedTeacherData = await CacheManager.getSelectedGroupTeacher();
     if (selectedTeacherData != null) {
-      final bloc = context.read<GroupTeacherBloc>();
-      bloc.add(
-          LoadGroupTeacherBlocEvent()); // Запрос на загрузку преподавателей
-      final selectedTeacher = await CacheManager.getSelectedGroupTeacher();
+      if (mounted) {
+        final bloc = context.read<GroupTeacherBloc>();
+        bloc.add(
+            LoadGroupTeacherBlocEvent()); // Запрос на загрузку преподавателей
 
-      // Используем listen для определения состояния, чтобы загрузить уроки в случае успеха
-      bloc.stream.listen((state) {
-        if (state is GroupTeacherLoaded) {
-          this.selectedTeacher = state.groupTeachers.firstWhere(
-            (teacher) => teacher.name == selectedTeacherData['name'],
-            orElse: null,
-          );
+        // Используем listen для определения состояния, чтобы загрузить уроки в случае успеха
+        bloc.stream.listen((state) {
+          if (state is GroupTeacherLoaded) {
+            selectedTeacher = state.groupTeachers.firstWhere(
+              (teacher) => teacher.name == selectedTeacherData['name'],
+              orElse: null,
+            );
 
-          if (this.selectedTeacher != null) {
-            bloc.add(LoadLessonsEvent(
-                this.selectedTeacher!)); // Запрос на загрузку уроков
+            if (selectedTeacher != null) {
+              bloc.add(LoadLessonsEvent(
+                  selectedTeacher!)); // Запрос на загрузку уроков
+            }
           }
-        }
-      });
+        });
+      }
     }
   }
 
