@@ -20,6 +20,16 @@ class GroupTeacherLoaded extends GroupTeacherBlocState {
   List<Object?> get props => [groupTeachers];
 }
 
+// data selected state
+class GroupTeacherSelected extends GroupTeacherBlocState {
+  final GroupTeacherModel selectedTeacher;
+
+  GroupTeacherSelected(this.selectedTeacher);
+
+  @override
+  List<Object> get props => [selectedTeacher];
+}
+
 // data error state
 class GroupTeacherError extends GroupTeacherBlocState {
   final String message;

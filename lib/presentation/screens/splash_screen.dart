@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_app/bloc/group_teacher_bloc/group_teacher_bloc_bloc.dart';
-import 'package:go_router/go_router.dart'; // Импортируйте GoRouter для навигации
+import 'package:schedule_app/utils/cache_manager.dart'; // Импортируйте CacheManager
+import 'package:go_router/go_router.dart';
 
 class LaunchSplashScreen extends StatefulWidget {
   const LaunchSplashScreen({super.key});
@@ -19,7 +20,6 @@ class _LaunchSplashScreenState extends State<LaunchSplashScreen> {
       ),
       body: Column(
         children: [
-          // Кнопка для перехода на экран Home
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
@@ -40,10 +40,26 @@ class _LaunchSplashScreenState extends State<LaunchSplashScreen> {
                   return ListView.builder(
                     itemCount: state.groupTeachers.length,
                     itemBuilder: (context, index) {
+                      final teacher = state.groupTeachers[index];
                       return ListTile(
-                        onTap: () => print(
-                            'Group teacher tapped: ${state.groupTeachers[index].name}'),
-                        title: Text(state.groupTeachers[index].name),
+                        onTap: () async {
+                          // Сохраните выбранного преподавателя в BLoC
+                          context
+                              .read<GroupTeacherBloc>()
+                              .add(SelectGroupTeacherEvent(teacher));
+                          print('Group teacher tapped: ${teacher.name}');
+
+                          // Вывод сохранённых данных в консоль
+                          final selectedItem =
+                              await CacheManager.getSelectedGroupTeacher();
+                          if (selectedItem != null) {
+                            print(
+                                'Saved element ID: ${selectedItem['id']}, Name: ${selectedItem['name']}');
+                          } else {
+                            print('No element selected or saved.');
+                          }
+                        },
+                        title: Text(teacher.name),
                       );
                     },
                   );
