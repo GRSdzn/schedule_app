@@ -14,7 +14,7 @@ class LaunchSplashScreen extends StatefulWidget {
 
 class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   String searchQuery = ''.toLowerCase();
-  Timer? debounce; // Переменная для таймера
+  Timer? debounce; // Таймер для поиска
 
   @override
   void initState() {
@@ -26,16 +26,30 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   // Функция поиска
   List<GroupListData> search(List<GroupListData> groups) {
     return groups
-        .where((group) =>
-            group.name.toLowerCase().contains(searchQuery.toLowerCase()))
+        .where((group) => group.name.toLowerCase().contains(searchQuery))
         .toList();
+  }
+
+  // Метод обновления данных
+  Future<void> updateList() async {
+    BlocProvider.of<GetDataListBloc>(context).add(GetDataListEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Schedule APP'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: GestureDetector(
+              onTap: updateList,
+              child: const Icon(Icons.refresh),
+            ),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50.0),
           child: Padding(
@@ -49,7 +63,7 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
                 if (debounce?.isActive ?? false) debounce!.cancel();
                 debounce = Timer(const Duration(milliseconds: 500), () {
                   setState(() {
-                    searchQuery = value;
+                    searchQuery = value.toLowerCase();
                   });
                 });
               },
@@ -64,38 +78,45 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
           } else if (state is GetDataListBlocLoaded) {
             // Отображение списка загруженных данных
             final filteredList = search(state.groupsAndTeacherList);
-            return ListView.builder(
-              itemCount: filteredList.length,
-              itemBuilder: (context, index) {
-                final group = filteredList[index];
-                return ListTile(
-                  onTap: () =>
-                      // ignore: avoid_print
-                      print('u clicked on ${group.name} with ${group.id}'),
-                  title: Text(group.name),
-                );
-              },
+            return RefreshIndicator(
+              onRefresh: updateList, // Метод обновления при потягивании вниз
+              child: ListView.builder(
+                itemCount: filteredList.length,
+                itemBuilder: (context, index) {
+                  final group = filteredList[index];
+                  return ListTile(
+                    onTap: () =>
+                        // ignore: avoid_print
+                        print('Вы кликнули на ${group.name} с ID ${group.id}'),
+                    title: Text(group.name),
+                  );
+                },
+              ),
             );
           } else if (state is GetDataListBlocError) {
             return Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text('Ошибка: ${state.message}'),
-                const SizedBox(height: 50),
-                ElevatedButton(
-                    onPressed: () => {
-                          BlocProvider.of<GetDataListBloc>(context)
-                              .add(GetDataListEvent())
-                        },
-                    child: const Text('Retry')),
-              ],
-            ));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Ошибка: ${state.message}'),
+                  const SizedBox(height: 50),
+                  ElevatedButton(
+                    onPressed: updateList,
+                    child: const Text('Повторить'),
+                  ),
+                ],
+              ),
+            );
           }
           return const Center(child: Text('Инициализация...'));
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    debounce?.cancel(); // Отменяем таймер, если он активен
+    super.dispose();
   }
 }
