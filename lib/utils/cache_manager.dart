@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CacheManager {
@@ -11,7 +12,9 @@ class CacheManager {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final id = prefs.getInt('selected_group_teacher_id');
     final name = prefs.getString('selected_group_teacher_name');
-    print('cached id: $id, name: $name');
+    if (kDebugMode) {
+      print('cached id: $id, name: $name');
+    }
     if (id != null && name != null) {
       return {'id': id, 'name': name};
     }

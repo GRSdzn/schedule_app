@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:schedule_app/app/router/scaffold_with_nested_navigation.dart';
-import 'package:schedule_app/bloc/group_teacher_bloc/group_teacher_bloc_bloc.dart';
-import 'package:schedule_app/data/repository/group_teacher_repo.dart';
-import 'package:schedule_app/presentation/screens/schedule_screen.dart';
-import 'package:schedule_app/presentation/screens/settings_screen.dart';
-import 'package:schedule_app/presentation/screens/splash_screen.dart';
+import 'package:schedule_app/features/launch_splash/data/repository/group_teacher_repo.dart';
+import 'package:schedule_app/features/launch_splash/presentation/bloc/get_data_list_bloc_bloc.dart';
+import 'package:schedule_app/features/schedule/presentation/schedule_screen.dart';
+import 'package:schedule_app/features/settings/presentation/settings_screen.dart';
+import 'package:schedule_app/features/launch_splash/presentation/splash_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorAKey =
@@ -14,25 +15,20 @@ final _shellNavigatorAKey =
 final _shellNavigatorBKey =
     GlobalKey<NavigatorState>(debugLabel: 'ScheduleScreenShell');
 
-final groupTeacherRepo = GroupTeacherRepo();
-
 final goRouter = GoRouter(
   initialLocation: '/',
   navigatorKey: _rootNavigatorKey,
   debugLogDiagnostics: true,
-  routes: <RouteBase>[
+  routes: [
     GoRoute(
       path: '/',
       pageBuilder: (context, state) {
         return NoTransitionPage(
-          child: RepositoryProvider.value(
-            value: groupTeacherRepo,
-            child: BlocProvider(
-              create: (context) => GroupTeacherBloc(
-                RepositoryProvider.of<GroupTeacherRepo>(context),
-              )..add(LoadGroupTeacherBlocEvent()),
-              child: const LaunchSplashScreen(),
-            ),
+          key: const ValueKey('LaunchScreen'),
+          child: BlocProvider(
+            create: (_) => GetDataListBloc(
+                GetGroupsAndTeachersList()), // Создание экземпляра репозитория
+            child: const LaunchSplashScreen(),
           ),
         );
       },
@@ -49,16 +45,8 @@ final goRouter = GoRouter(
               name: 'Schedule',
               path: '/schedule',
               pageBuilder: (context, state) {
-                return NoTransitionPage(
-                  child: RepositoryProvider(
-                    create: (context) => GroupTeacherRepo(),
-                    child: BlocProvider(
-                      create: (context) => GroupTeacherBloc(
-                        RepositoryProvider.of<GroupTeacherRepo>(context),
-                      )..add(LoadGroupTeacherBlocEvent()),
-                      child: const ScheduleScreen(),
-                    ),
-                  ),
+                return const NoTransitionPage(
+                  child: ScheduleScreen(),
                 );
               },
             ),
