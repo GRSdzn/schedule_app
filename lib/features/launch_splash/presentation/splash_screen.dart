@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_app/features/launch_splash/data/models/group_list.dart';
@@ -12,6 +14,7 @@ class LaunchSplashScreen extends StatefulWidget {
 
 class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   String searchQuery = ''.toLowerCase();
+  Timer? debounce; // Переменная для таймера
 
   @override
   void initState() {
@@ -43,8 +46,11 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
-                setState(() {
-                  searchQuery = value; // Обновляем поисковый запрос
+                if (debounce?.isActive ?? false) debounce!.cancel();
+                debounce = Timer(const Duration(milliseconds: 500), () {
+                  setState(() {
+                    searchQuery = value;
+                  });
                 });
               },
             ),
