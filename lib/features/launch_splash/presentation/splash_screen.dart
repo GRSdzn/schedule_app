@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_app/app/router/main_router.dart';
 import 'package:schedule_app/features/launch_splash/data/models/group_list.dart';
 import 'package:schedule_app/features/launch_splash/presentation/bloc/get_data_list_bloc_bloc.dart';
 
@@ -85,9 +86,11 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
                 itemBuilder: (context, index) {
                   final group = filteredList[index];
                   return ListTile(
-                    onTap: () =>
-                        // ignore: avoid_print
-                        print('Вы кликнули на ${group.name} с ID ${group.id}'),
+                    onTap: () => {
+                      // ignore: avoid_print
+                      print('Вы кликнули на ${group.name} с ID ${group.id}'),
+                      goRouter.push('/schedule'),
+                    },
                     title: Text(group.name),
                   );
                 },
