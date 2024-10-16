@@ -13,7 +13,7 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   String? selectedGroupName;
   final PreferencesService preferencesService = PreferencesService();
-  String searchQuery = ''; // Добавим переменную для поиска
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -23,7 +23,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> _loadSelectedGroup() async {
     selectedGroupName = await preferencesService.loadSelectedGroup();
-    setState(() {}); // Обновляем состояние
+    setState(() {});
   }
 
   void _showBottomSheet(BuildContext context) {
@@ -38,7 +38,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             if (state is GetDataListBlocLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is GetDataListBlocLoaded) {
-              // Фильтруем группы по запросу
               final filteredGroups = state.groupsAndTeacherList.where((group) {
                 return group.name
                     .toLowerCase()
@@ -53,14 +52,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Поиск',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
-                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
                         ),
                       ),
                       onChanged: (value) {
                         setState(() {
-                          searchQuery = value; // Обновляем поисковый запрос
+                          searchQuery = value;
                         });
                       },
                     ),
@@ -73,16 +70,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         return ListTile(
                           title: Text(group.name),
                           onTap: () async {
-                            // Обновляем выбранную группу
                             await preferencesService
                                 .saveSelectedGroup(group.name);
+                            print('Сохранена группа: ${group.name}'); // Отладка
                             setState(() {
                               selectedGroupName =
-                                  group.name; // Обновляем текущее состояние
+                                  group.name; // Обновляем состояние
                             });
-
                             if (mounted) {
-                              // ignore: use_build_context_synchronously
                               Navigator.pop(context);
                             }
                           },
@@ -111,8 +106,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert),
-            onPressed: () =>
-                _showBottomSheet(context), // Открываем модальное окно
+            onPressed: () => _showBottomSheet(context),
           ),
         ],
       ),

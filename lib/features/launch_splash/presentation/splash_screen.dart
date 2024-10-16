@@ -1,10 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_app/app/router/main_router.dart';
 import 'package:schedule_app/features/launch_splash/data/models/group_list.dart';
 import 'package:schedule_app/features/launch_splash/presentation/bloc/get_data_list_bloc_bloc.dart';
+import 'package:schedule_app/services/preferences_service.dart'; // Импортируйте PreferencesService
 
 class LaunchSplashScreen extends StatefulWidget {
   const LaunchSplashScreen({super.key});
@@ -15,23 +15,22 @@ class LaunchSplashScreen extends StatefulWidget {
 
 class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   String searchQuery = ''.toLowerCase();
-  Timer? debounce; // Таймер для поиска
+  Timer? debounce;
+  final PreferencesService preferencesService =
+      PreferencesService(); // Экземпляр PreferencesService
 
   @override
   void initState() {
     super.initState();
-    // Запускаем событие для получения данных
     BlocProvider.of<GetDataListBloc>(context).add(GetDataListEvent());
   }
 
-  // Функция поиска
   List<GroupListData> search(List<GroupListData> groups) {
     return groups
         .where((group) => group.name.toLowerCase().contains(searchQuery))
         .toList();
   }
 
-  // Метод обновления данных
   Future<void> updateList() async {
     BlocProvider.of<GetDataListBloc>(context).add(GetDataListEvent());
   }
@@ -77,19 +76,19 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
           if (state is GetDataListBlocLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is GetDataListBlocLoaded) {
-            // Отображение списка загруженных данных
             final filteredList = search(state.groupsAndTeacherList);
             return RefreshIndicator(
-              onRefresh: updateList, // Метод обновления при потягивании вниз
+              onRefresh: updateList,
               child: ListView.builder(
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
                   final group = filteredList[index];
                   return ListTile(
-                    onTap: () => {
-                      // ignore: avoid_print
-                      print('Вы кликнули на ${group.name} с ID ${group.id}'),
-                      goRouter.push('/schedule'),
+                    onTap: () async {
+                      // Сохраняем выбранную группу
+                      await preferencesService.saveSelectedGroup(group.name);
+                      print('Сохранена группа: ${group.name}'); // Отладка
+                      goRouter.push('/schedule');
                     },
                     title: Text(group.name),
                   );
@@ -119,7 +118,7 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
 
   @override
   void dispose() {
-    debounce?.cancel(); // Отменяем таймер, если он активен
+    debounce?.cancel();
     super.dispose();
   }
 }
