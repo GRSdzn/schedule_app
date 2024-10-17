@@ -1,6 +1,9 @@
+import 'package:intl/intl.dart';
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_app/app/router/main_router.dart';
 import 'package:schedule_app/bloc/get_data_list_bloc/get_data_list_bloc_bloc.dart';
 import 'package:schedule_app/bloc/get_schedule/get_schedule_bloc.dart';
 import 'package:schedule_app/core/constants/theme/src/app_colors.dart';
@@ -47,9 +50,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
-      isScrollControlled: true,
+      isScrollControlled: false,
       showDragHandle: true,
-      isDismissible: false,
+      isDismissible: true,
       context: context,
       builder: (context) {
         return BlocBuilder<GetDataListBloc, GetDataListBlocState>(
@@ -108,10 +111,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ],
               );
             } else if (state is GetDataListBlocError) {
-              return Center(child: Text('Ошибка: ${state.message}'));
+              return Center(
+                  child: Text(
+                'Ошибка: ${state.message}',
+                style: const TextStyle(color: Colors.red),
+              ));
             }
 
-            return const Center(child: Text('Инициализация...'));
+            return const Center(
+                child: Text(
+              'Инициализация...',
+              style: TextStyle(color: Colors.red),
+            ));
           },
         );
       },
@@ -134,9 +145,28 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             currentSchedule = state.schedule; // Получение расписания
             return _buildSchedulePageView(currentSchedule!);
           } else if (state is GetScheduleBlocError) {
-            return Center(child: Text('Ошибка: ${state.message}'));
+            return Center(
+                child: Column(
+              children: [
+                Text(
+                  'Ошибка: ${state.message}',
+                  style: const TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 50),
+                ElevatedButton(
+                  onPressed: () {
+                    goRouter.go('/');
+                  },
+                  child: const Text('Повторить попытку'),
+                )
+              ],
+            ));
           }
-          return const Center(child: Text('пусто...'));
+          return const Center(
+              child: Text(
+            'пусто...',
+            style: TextStyle(color: Colors.red),
+          ));
         },
       ),
     );
@@ -200,7 +230,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             decoration: BoxDecoration(
               color: Colors.white, // Белый фон
               borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20)), // Закругленные края сверху
+                  top: Radius.circular(30)), // Закругленные края сверху
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -230,6 +260,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     if (pairs == null || pairs.isEmpty) {
       return const SizedBox(); // Don't display day if no pairs
+    }
+    String formatTime(String time) {
+      // Предполагается, что входное время в формате HH:mm или HH:mm:ss
+      final dateTime = DateTime.parse('1970-01-01 $time');
+      return DateFormat('HH:mm').format(dateTime);
     }
 
     return Card(
@@ -273,7 +308,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           )),
-                      subtitle: Text('${pair.startTime} - ${pair.endTime}'),
+                      // Используем функцию formatTime для форматирования времени
+                      subtitle: Text(
+                        '${formatTime(pair.startTime ?? '')} - ${formatTime(pair.endTime ?? '')}',
+                      ),
                     );
                   }).toList(),
                 );

@@ -1,34 +1,45 @@
+import 'dart:ui'; // Для BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:schedule_app/core/constants/theme/src/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final VoidCallback onTitleTap; // Callback for when the title is tapped
+  final VoidCallback onTitleTap;
 
   const CustomAppBar({
     super.key,
     required this.title,
-    required this.onTitleTap, // Add this to handle tap events
+    required this.onTitleTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60.0, // Set height to make the background smaller
-      decoration: BoxDecoration(
-        color: AppColors.primaryBackground, // Background color of the AppBar
-        borderRadius:
-            const BorderRadius.vertical(bottom: Radius.circular(30.0)),
-      ),
-      child: AppBar(
-        title: GestureDetector(
-          onTap: onTitleTap, // Assign the tap callback
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white, // Text color
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30.0)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+            sigmaX: 10.0, sigmaY: 10.0), // Устанавливаем эффект размытия
+        child: Container(
+          height: 60.0,
+          decoration: BoxDecoration(
+            color: AppColors.primaryBackground
+                .withOpacity(0.8), // Полупрозрачный фон
+            borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(30.0)),
+          ),
+          child: AppBar(
+            // Убираем цвет фона у AppBar
+            backgroundColor: Colors.transparent,
+            title: GestureDetector(
+              onTap: onTitleTap,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ),
@@ -37,6 +48,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize =>
-      const Size.fromHeight(60.0); // Set AppBar height to match the Container
+  Size get preferredSize => const Size.fromHeight(60.0);
 }
