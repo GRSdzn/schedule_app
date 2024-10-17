@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/io_client.dart';
-import 'package:schedule_app/features/launch_splash/data/models/group_list.dart';
+import 'package:schedule_app/data/launch_splash/models/group_list.dart';
 import 'dart:io';
-import 'package:schedule_app/features/launch_splash/domain/repository/group_teacher_repo_interface.dart';
+import 'package:schedule_app/domain/launch_splash/repository/group_teacher_repo_interface.dart';
 
 class GetGroupsAndTeachersList implements GetGroupsAndTeachersListInterface {
   final String endpoint = 'https://rasp-api.rsue.ru/api/v1/schedule/search/';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // Импортируем для работы с Bloc
-import 'package:schedule_app/features/launch_splash/presentation/bloc/get_data_list_bloc_bloc.dart'; // Импортируйте ваш BLoC
+import 'package:schedule_app/bloc/get_data_list_bloc/get_data_list_bloc_bloc.dart'; // Импортируйте ваш BLoC
 import 'package:schedule_app/services/preferences_service.dart';
 
 class ScheduleScreen extends StatefulWidget {

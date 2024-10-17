@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_app/app/router/main_router.dart';
-import 'package:schedule_app/features/launch_splash/data/models/group_list.dart';
-import 'package:schedule_app/features/launch_splash/presentation/bloc/get_data_list_bloc_bloc.dart';
+import 'package:schedule_app/data/launch_splash/models/group_list.dart';
+import 'package:schedule_app/bloc/get_data_list_bloc/get_data_list_bloc_bloc.dart';
 import 'package:schedule_app/services/preferences_service.dart'; // Импортируйте PreferencesService
 
 class LaunchSplashScreen extends StatefulWidget {

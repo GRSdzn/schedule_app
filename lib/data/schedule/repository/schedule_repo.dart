@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/io_client.dart';
 import 'dart:io';
 
-import 'package:schedule_app/features/schedule/domain/schedule_repo_interface.dart';
+import 'package:schedule_app/domain/schedule/schedule_repo_interface.dart';
 
 class ScheduleRepo implements ScheduleRepoInterface {
   final String endpoint = 'https://rasp-api.rsue.ru/api/v1/schedule/search/';

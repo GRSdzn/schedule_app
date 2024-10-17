@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:schedule_app/app/router/scaffold_with_nested_navigation.dart';
-import 'package:schedule_app/features/schedule/presentation/schedule_screen.dart';
-import 'package:schedule_app/features/settings/presentation/settings_screen.dart';
-import 'package:schedule_app/features/launch_splash/presentation/splash_screen.dart';
+import 'package:schedule_app/presentation/screen/schedule_screen.dart';
+import 'package:schedule_app/presentation/screen/settings_screen.dart';
+import 'package:schedule_app/presentation/screen/splash_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorAKey =
