@@ -147,6 +147,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           } else if (state is GetScheduleBlocError) {
             return Center(
                 child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Ошибка: ${state.message}',
@@ -154,10 +156,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ),
                 const SizedBox(height: 50),
                 ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(AppColors.primaryColor),
+                  ),
                   onPressed: () {
-                    goRouter.go('/');
+                    _showBottomSheet(context);
                   },
-                  child: const Text('Повторить попытку'),
+                  child: const Text('Список'),
                 )
               ],
             ));
@@ -213,11 +219,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     ),
                   ),
                   Text(
-                    'Дата: ${week.days?.isNotEmpty == true ? week.days![0].date : 'Нет данных'}',
+                    '${week.days?.isNotEmpty == true ? week.days![0].date : 'Нет данных'}',
                     style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.grey,
                     ),
                   ),
                 ],
@@ -242,8 +248,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             ),
             margin: const EdgeInsets.only(top: 10.0), // Отступ сверху
             child: Column(
-              children:
-                  week.days?.map((day) => _buildDayContent(day)).toList() ?? [],
+              children: [
+                // Установка минимальной высоты
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height *
+                        0.8, // Минимальная высота 30% от высоты экрана
+                  ),
+                  child: Column(
+                    children: week.days
+                            ?.map((day) => _buildDayContent(day))
+                            .toList() ??
+                        [],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -286,11 +305,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   style:
                       const TextStyle(fontSize: 24, color: AppColors.textColor),
                 ),
-                Text(
-                  '${day.date}',
-                  style: const TextStyle(
-                      fontSize: 14, color: Color.fromARGB(166, 96, 125, 139)),
-                ),
+                // Text(
+                //   '${day.date}',
+                //   style: const TextStyle(
+                //       fontSize: 14, color: Color.fromARGB(166, 96, 125, 139)),
+                // ),
               ],
             ),
             const SizedBox(height: 8.0),
@@ -306,7 +325,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       title: Text(lesson.subject ?? '',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Color.fromARGB(221, 29, 28, 28),
                           )),
                       // Используем функцию formatTime для форматирования времени
                       subtitle: Text(

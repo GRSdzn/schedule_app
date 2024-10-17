@@ -19,7 +19,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // Выравнивание по центру
           children: [
-            Text('В разработке...'),
+            Text(
+              'В разработке...',
+              style: TextStyle(color: Colors.white),
+            ),
           ],
         ),
       ),

@@ -20,7 +20,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         filter: ImageFilter.blur(
             sigmaX: 10.0, sigmaY: 10.0), // Устанавливаем эффект размытия
         child: Container(
-          height: 60.0,
           decoration: BoxDecoration(
             color: AppColors.primaryBackground
                 .withOpacity(0.8), // Полупрозрачный фон
