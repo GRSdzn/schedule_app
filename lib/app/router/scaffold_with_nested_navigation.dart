@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:schedule_app/core/constants/theme/src/app_colors.dart';
 
 class ScaffoldWithNestedNavigation extends StatelessWidget {
   const ScaffoldWithNestedNavigation({
@@ -54,10 +55,32 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
     return Scaffold(
       body: body,
       bottomNavigationBar: NavigationBar(
+        backgroundColor: Colors.white,
+        indicatorColor: AppColors.primaryBackground,
+        height: 60.0,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: selectedIndex,
-        destinations: const [
-          NavigationDestination(label: 'Главная', icon: Icon(Icons.home)),
-          NavigationDestination(label: 'Настройки', icon: Icon(Icons.settings)),
+        destinations: [
+          NavigationDestination(
+            icon: Icon(Icons.home,
+                color: selectedIndex == 0
+                    ? Colors.white
+                    : Colors
+                        .black), // Использовать белый цвет для выбранной иконки
+            label: 'Главная',
+            selectedIcon:
+                const Icon(Icons.home, color: Colors.white), // Выбранная иконка
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings,
+                color: selectedIndex == 1
+                    ? Colors.white
+                    : Colors
+                        .black), // Использовать белый цвет для выбранной иконки
+            label: 'Настройки',
+            selectedIcon: const Icon(Icons.settings,
+                color: Colors.white), // Выбранная иконка
+          ),
         ],
         onDestinationSelected: onDestinationSelected,
       ),
@@ -83,21 +106,35 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
       body: Row(
         children: [
           NavigationRail(
+            backgroundColor: AppColors.primaryBackground,
+            labelType: NavigationRailLabelType.none, // No labels
             selectedIndex: selectedIndex,
+            indicatorColor: Colors.white,
             onDestinationSelected: onDestinationSelected,
-            labelType: NavigationRailLabelType.all,
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                label: Text('Home'),
-                icon: Icon(Icons.home),
+                icon: Icon(Icons.home,
+                    color: selectedIndex == 0
+                        ? Colors.black
+                        : Colors
+                            .white), // Использовать белый цвет для выбранной иконки
+                label: const Text('Главная'), // Empty label
               ),
               NavigationRailDestination(
-                label: Text('Settings'),
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.settings,
+                    color: selectedIndex == 1
+                        ? Colors.black
+                        : Colors
+                            .white), // Использовать белый цвет для выбранной иконки
+                label: const Text('Настройки'), // Empty label
               ),
             ],
           ),
-          const VerticalDivider(thickness: 1, width: 1),
+          const VerticalDivider(
+            thickness: 1,
+            width: 1,
+            color: AppColors.primaryLightGray,
+          ),
           Expanded(
             child: body,
           ),

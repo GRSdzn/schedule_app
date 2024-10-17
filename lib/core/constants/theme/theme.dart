@@ -10,43 +10,20 @@ final globalTheme = ThemeData(
     textColor: Colors.black87,
     collapsedIconColor: AppColors.primaryColor,
     iconColor: AppColors.primaryColor,
-    collapsedBackgroundColor: Colors.transparent,
+    // collapsedBackgroundColor: Colors.transparent,
   ),
   progressIndicatorTheme:
       const ProgressIndicatorThemeData(color: AppColors.primaryColor),
-  scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-  primaryColor: AppColors.primaryColor,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: AppColors.primaryColor,
-    foregroundColor: Colors.white,
-    iconTheme: IconThemeData(
-      color: Colors.white,
-    ),
+  scaffoldBackgroundColor: AppColors.primaryBackground,
+  bottomAppBarTheme: const BottomAppBarTheme(
+    color: Colors.white,
+    shape: CircularNotchedRectangle(),
   ),
-
-  listTileTheme: const ListTileThemeData(
-    iconColor: AppColors.primaryColor,
+  appBarTheme: const AppBarTheme(
+    color: Colors.transparent,
   ),
   iconTheme: const IconThemeData(
     color: AppColors.textLightColor,
   ),
   primaryIconTheme: const IconThemeData(color: Colors.white),
-  // textfield theme
-  // inputDecorationTheme: const InputDecorationTheme(
-  //   enabledBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: AppColors.primaryGray,
-  //     ),
-  //   ),
-  //   errorBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: AppColors.primaryRed,
-  //     ),
-  //   ),
-  //   focusedErrorBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: AppColors.primaryRed,
-  //     ),
-  //   ),
-  // ),
 );

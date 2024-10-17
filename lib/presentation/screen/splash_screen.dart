@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_app/app/router/main_router.dart';
-import 'package:schedule_app/data/launch_splash/models/group_list.dart';
+import 'package:schedule_app/data/schedule/models/group_list.dart';
 import 'package:schedule_app/bloc/get_data_list_bloc/get_data_list_bloc_bloc.dart';
+import 'package:schedule_app/presentation/widgets/search_widget.dart';
 import 'package:schedule_app/services/preferences_service.dart'; // Импортируйте PreferencesService
 
 class LaunchSplashScreen extends StatefulWidget {
@@ -15,7 +16,6 @@ class LaunchSplashScreen extends StatefulWidget {
 
 class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   String searchQuery = ''.toLowerCase();
-  Timer? debounce;
   final PreferencesService preferencesService =
       PreferencesService(); // Экземпляр PreferencesService
 
@@ -51,23 +51,14 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Поиск...',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                if (debounce?.isActive ?? false) debounce!.cancel();
-                debounce = Timer(const Duration(milliseconds: 500), () {
-                  setState(() {
-                    searchQuery = value.toLowerCase();
-                  });
-                });
-              },
-            ),
+          preferredSize: const Size.fromHeight(50),
+          child: SearchWidget(
+            searchQuery: searchQuery,
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value.toLowerCase();
+              });
+            },
           ),
         ),
       ),
@@ -85,30 +76,30 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
                   final group = filteredList[index];
                   return ListTile(
                     onTap: () async {
-                      // Сохраняем выбранную группу
-                      await preferencesService.saveSelectedGroup(group.name);
-                      print('Сохранена группа: ${group.name}'); // Отладка
-                      goRouter.push('/schedule');
+                      try {
+                        await preferencesService.saveSelectedGroup(group.name);
+                        print('Сохранена группа: ${group.name}');
+
+                        // Проверяем, что группа сохранилась
+                        String? savedGroup =
+                            await preferencesService.loadSelectedGroup();
+                        print('Загруженная группа: $savedGroup');
+
+                        goRouter.push('/schedule');
+                      } catch (e) {
+                        print('Ошибка при сохранении группы: $e');
+                      }
                     },
-                    title: Text(group.name),
+                    title: Text(
+                      group.name,
+                      style: const TextStyle(fontSize: 18, color: Colors.white),
+                    ),
                   );
                 },
               ),
             );
           } else if (state is GetDataListBlocError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Ошибка: ${state.message}'),
-                  const SizedBox(height: 50),
-                  ElevatedButton(
-                    onPressed: updateList,
-                    child: const Text('Повторить'),
-                  ),
-                ],
-              ),
-            );
+            return Center(child: Text('Ошибка: ${state.message}'));
           }
           return const Center(child: Text('Инициализация...'));
         },
@@ -118,7 +109,6 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
 
   @override
   void dispose() {
-    debounce?.cancel();
     super.dispose();
   }
 }
