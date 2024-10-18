@@ -1,14 +1,13 @@
-import 'package:intl/intl.dart';
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:schedule_app/app/router/main_router.dart';
-import 'package:schedule_app/bloc/get_data_list_bloc/get_data_list_bloc_bloc.dart';
 import 'package:schedule_app/bloc/get_schedule/get_schedule_bloc.dart';
 import 'package:schedule_app/core/constants/theme/src/app_colors.dart';
+import 'package:schedule_app/core/constants/theme/src/app_rounded.dart';
 import 'package:schedule_app/data/schedule/models/selected_schedule_model.dart';
+import 'package:schedule_app/presentation/widgets/bottom_sheet_data.dart';
 import 'package:schedule_app/presentation/widgets/custom_app_bar.dart';
+import 'package:schedule_app/presentation/widgets/schedule_widgets/week_content.dart';
 import 'package:schedule_app/services/preferences_service.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -23,26 +22,33 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final PreferencesService preferencesService = PreferencesService();
   late PageController _pageController;
   ScheduleModel? currentSchedule;
-  String searchQuery = '';
-  int currentPageIndex = 0; // Current page index tracking
+  int currentPageIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadSelectedGroup();
     _pageController = PageController()
       ..addListener(() {
         setState(() {
           currentPageIndex = _pageController.page!.round();
         });
       });
+    _loadSelectedGroup();
   }
 
   Future<void> _loadSelectedGroup() async {
     selectedGroupName = await preferencesService.loadSelectedGroup();
-    setState(() {});
+    setState(
+        () {}); // Обновить состояние, чтобы перерисовать виджет с новым значением
+    if (selectedGroupName != null) {
+      _loadSchedule();
+    }
+  }
 
-    if (selectedGroupName != null && mounted) {
+  void _loadSchedule() {
+    final state = BlocProvider.of<GetScheduleBloc>(context).state;
+    if (state is! GetScheduleBlocLoaded ||
+        state.schedule.groupName != selectedGroupName) {
       BlocProvider.of<GetScheduleBloc>(context)
           .add(GetScheduleEvent(selectedGroupName!));
     }
@@ -50,79 +56,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
+      backgroundColor: AppColors.primaryBackground,
       isScrollControlled: false,
       showDragHandle: true,
-      isDismissible: true,
+      useRootNavigator: true,
+      shape: const RoundedRectangleBorder(borderRadius: appBorderRadiusTop),
       context: context,
       builder: (context) {
-        return BlocBuilder<GetDataListBloc, GetDataListBlocState>(
-          builder: (context, state) {
-            if (state is GetDataListBlocLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is GetDataListBlocLoaded) {
-              final filteredGroups = state.groupsAndTeacherList.where((group) {
-                return group.name
-                    .toLowerCase()
-                    .contains(searchQuery.toLowerCase());
-              }).toList();
-
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Поиск',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchQuery = value;
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredGroups.length,
-                      itemBuilder: (context, index) {
-                        final group = filteredGroups[index];
-                        return ListTile(
-                          title: Text(group.name),
-                          onTap: () async {
-                            await preferencesService
-                                .saveSelectedGroup(group.name);
-                            setState(() {
-                              selectedGroupName = group.name; // Update state
-                            });
-                            // Load schedule for the selected group
-                            BlocProvider.of<GetScheduleBloc>(context)
-                                .add(GetScheduleEvent(group.name));
-                            if (mounted) {
-                              Navigator.pop(context);
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
-            } else if (state is GetDataListBlocError) {
-              return Center(
-                  child: Text(
-                'Ошибка: ${state.message}',
-                style: const TextStyle(color: Colors.red),
-              ));
-            }
-
-            return const Center(
-                child: Text(
-              'Инициализация...',
-              style: TextStyle(color: Colors.red),
-            ));
+        return MyBottomSheetList(
+          onGroupSelected: (selectedGroup) {
+            setState(() {
+              selectedGroupName = selectedGroup;
+            });
+            _loadSchedule();
           },
         );
       },
@@ -142,37 +88,31 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           if (state is GetScheduleBlocLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is GetScheduleBlocLoaded) {
-            currentSchedule = state.schedule; // Получение расписания
+            currentSchedule = state.schedule;
             return _buildSchedulePageView(currentSchedule!);
           } else if (state is GetScheduleBlocError) {
             return Center(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Ошибка: ${state.message}',
-                  style: const TextStyle(color: Colors.red),
-                ),
-                const SizedBox(height: 50),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(AppColors.primaryColor),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Ошибка: ${state.message}',
+                      style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 50),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all(AppColors.primaryColor),
+                    ),
+                    onPressed: () => _showBottomSheet(context),
+                    child: const Text('Список'),
                   ),
-                  onPressed: () {
-                    _showBottomSheet(context);
-                  },
-                  child: const Text('Список'),
-                )
-              ],
-            ));
+                ],
+              ),
+            );
           }
           return const Center(
-              child: Text(
-            'пусто...',
-            style: TextStyle(color: Colors.red),
-          ));
+              child: Text('пусто...', style: TextStyle(color: Colors.red)));
         },
       ),
     );
@@ -184,161 +124,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       itemCount: schedule.weeks?.length ?? 0,
       itemBuilder: (context, index) {
         final week = schedule.weeks![index];
-        return _buildWeekContent(week);
+        return WeekContent(week: week);
       },
       onPageChanged: (index) {
         setState(() {
           currentPageIndex = index;
         });
       },
-    );
-  }
-
-  Widget _buildWeekContent(Weeks week) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          backgroundColor: AppColors.primaryBackground,
-          pinned: false,
-          floating: false,
-          snap: false,
-          expandedHeight: 100.0,
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Неделя: ${week.name}',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    '${week.days?.isNotEmpty == true ? week.days![0].date : 'Нет данных'}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white, // Белый фон
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(30)), // Закругленные края сверху
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3), // тень снизу
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.only(top: 10.0), // Отступ сверху
-            child: Column(
-              children: [
-                // Установка минимальной высоты
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height *
-                        0.8, // Минимальная высота 30% от высоты экрана
-                  ),
-                  child: Column(
-                    children: week.days
-                            ?.map((day) => _buildDayContent(day))
-                            .toList() ??
-                        [],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDayContent(Days day) {
-    final pairs = day.pairs
-        ?.where((pair) =>
-            pair.lessons?.any((lesson) => lesson.subject?.isNotEmpty == true) ==
-            true)
-        .toList();
-
-    if (pairs == null || pairs.isEmpty) {
-      return const SizedBox(); // Don't display day if no pairs
-    }
-    String formatTime(String time) {
-      // Предполагается, что входное время в формате HH:mm или HH:mm:ss
-      final dateTime = DateTime.parse('1970-01-01 $time');
-      return DateFormat('HH:mm').format(dateTime);
-    }
-
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      elevation: 2,
-      shadowColor: Colors.transparent,
-      color: AppColors.primaryLightGray,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${day.name}',
-                  style:
-                      const TextStyle(fontSize: 24, color: AppColors.textColor),
-                ),
-                // Text(
-                //   '${day.date}',
-                //   style: const TextStyle(
-                //       fontSize: 14, color: Color.fromARGB(166, 96, 125, 139)),
-                // ),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            Column(
-              children: pairs.map((pair) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: pair.lessons!
-                      .where((lesson) => lesson.subject?.isNotEmpty == true)
-                      .map((lesson) {
-                    return ListTile(
-                      contentPadding: const EdgeInsets.all(0),
-                      title: Text(lesson.subject ?? '',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(221, 29, 28, 28),
-                          )),
-                      // Используем функцию formatTime для форматирования времени
-                      subtitle: Text(
-                        '${formatTime(pair.startTime ?? '')} - ${formatTime(pair.endTime ?? '')}',
-                      ),
-                    );
-                  }).toList(),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -11,15 +11,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Create a single instance of each BLoC
+    final getDataListBloc = GetDataListBloc(ScheduleRepo());
+    final getScheduleBloc = GetScheduleBloc(ScheduleRepo());
+
     return MultiBlocProvider(
       providers: [
-        // GET DATA LIST BLOC
-        BlocProvider(
-          create: (_) => GetDataListBloc(ScheduleRepo()),
-        ),
-        BlocProvider(
-          create: (_) => GetScheduleBloc(ScheduleRepo()),
-        ),
+        BlocProvider.value(value: getDataListBloc),
+        BlocProvider.value(value: getScheduleBloc),
       ],
       child: MaterialApp.router(
         title: 'Flutter Schedule',

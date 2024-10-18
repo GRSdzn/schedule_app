@@ -10,9 +10,23 @@ class GetDataListBloc extends Bloc<GetDataListBlocEvent, GetDataListBlocState> {
   final GetGroupsAndTeachersListInterface repository;
 
   GetDataListBloc(this.repository) : super(GetDataListBlocInitial()) {
-    on<GetDataListBlocEvent>((event, emit) async {
-      emit(GetDataListBlocLoading());
+    // load data
+    on<LoadDataListEvent>((event, emit) async {
+      if (state is! GetDataListBlocLoaded) {
+        // Загружаем данные с сервера если стейт не загружен
+        emit(GetDataListBlocLoading());
+        try {
+          final data = await repository.getGroupTeacher();
+          emit(GetDataListBlocLoaded(data));
+        } catch (e) {
+          emit(GetDataListBlocError(e.toString()));
+        }
+      }
+    });
 
+    // update data
+    on<UpdateDataListEvent>((event, emit) async {
+      emit(GetDataListBlocLoading());
       try {
         final data = await repository.getGroupTeacher();
         emit(GetDataListBlocLoaded(data));

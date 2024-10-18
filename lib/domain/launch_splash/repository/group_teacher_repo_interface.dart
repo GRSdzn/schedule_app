@@ -1,9 +1,9 @@
 import 'package:schedule_app/data/schedule/models/group_list.dart';
 
 abstract class GetGroupsAndTeachersListInterface {
-  // get all items list
+  // Получение всех групп и преподавателей
   Future<List<GroupListData>> getGroupTeacher();
 
-  // get selected item info
+  // Получение расписания для конкретной группы или преподавателя
   Future<Map<String, dynamic>> getLessonsForGroupTeacher(String groupName);
 }

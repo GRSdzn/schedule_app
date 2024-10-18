@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_app/core/constants/theme/src/app_colors.dart';
+import 'package:schedule_app/core/constants/theme/src/textfield_style.dart';
 
 // Глобальная тема приложения
 final globalTheme = ThemeData(
@@ -26,4 +27,5 @@ final globalTheme = ThemeData(
     color: AppColors.textLightColor,
   ),
   primaryIconTheme: const IconThemeData(color: Colors.white),
+  inputDecorationTheme: InputDecorationStyle.primaryTextField,
 );

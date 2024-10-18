@@ -15,4 +15,14 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('selected_group');
   }
+
+  Future<void> clearAllSchedules() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+    for (var key in keys) {
+      if (key.startsWith('schedule_')) {
+        await prefs.remove(key);
+      }
+    }
+  }
 }

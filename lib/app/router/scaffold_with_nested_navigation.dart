@@ -58,7 +58,9 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
         backgroundColor: Colors.white,
         indicatorColor: AppColors.primaryBackground,
         height: 60.0,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+
         selectedIndex: selectedIndex,
         destinations: [
           NavigationDestination(

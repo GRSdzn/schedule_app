@@ -1,6 +1,7 @@
 import 'dart:ui'; // Для BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:schedule_app/core/constants/theme/src/app_colors.dart';
+import 'package:schedule_app/core/constants/theme/src/app_rounded.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -15,17 +16,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30.0)),
+      borderRadius: appBorderRadiusBottom,
       child: BackdropFilter(
         filter: ImageFilter.blur(
             sigmaX: 10.0, sigmaY: 10.0), // Устанавливаем эффект размытия
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.primaryBackground
-                .withOpacity(0.8), // Полупрозрачный фон
-            borderRadius:
-                const BorderRadius.vertical(bottom: Radius.circular(30.0)),
-          ),
+              color: AppColors.primaryBackground
+                  .withOpacity(0.8), // Полупрозрачный фон
+              borderRadius: appBorderRadiusBottom),
           child: AppBar(
             // Убираем цвет фона у AppBar
             backgroundColor: Colors.transparent,

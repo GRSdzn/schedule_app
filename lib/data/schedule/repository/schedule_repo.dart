@@ -31,7 +31,7 @@ class ScheduleRepo implements GetGroupsAndTeachersListInterface {
 
       // print(utf8Response);
       if (kDebugMode) {
-        print('данные получены успешно');
+        print('Список пар получен успешно');
       }
       return jsonDecode(utf8Response);
     } catch (e) {
@@ -58,7 +58,7 @@ class ScheduleRepo implements GetGroupsAndTeachersListInterface {
       }
 
       if (kDebugMode) {
-        print('Success: ${response.statusCode}');
+        print('Список групп успешно получен: ${response.statusCode}');
       }
 
       final utf8Response = utf8.decode(response.bodyBytes);

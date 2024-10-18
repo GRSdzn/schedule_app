@@ -17,10 +17,14 @@ class SearchWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: TextField(
+        style: TextStyle(color: Colors.white), // Set input text color to white
         decoration: const InputDecoration(
           hintText: 'Поиск...',
+          hintStyle:
+              TextStyle(color: Colors.grey), // Optional: Style for hint text
           border: OutlineInputBorder(),
         ),
+
         onChanged: onChanged,
       ),
     );

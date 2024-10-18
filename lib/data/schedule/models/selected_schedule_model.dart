@@ -2,21 +2,25 @@ class ScheduleModel {
   String? kind;
   String? instance;
   List<Weeks>? weeks;
+  String? groupName; // Новое поле для имени группы
 
-  ScheduleModel({this.kind, this.instance, this.weeks});
+  ScheduleModel({this.kind, this.instance, this.weeks, this.groupName});
 
   ScheduleModel.fromJson(Map<String, dynamic> json)
       : kind = json['kind'],
         instance = json['instance'],
         weeks = (json['weeks'] as List<dynamic>?)
             ?.map((e) => Weeks.fromJson(e))
-            .toList();
+            .toList(),
+        groupName =
+            json['groupName']; // Обновите, чтобы получить имя группы из JSON
 
   Map<String, dynamic> toJson() {
     return {
       'kind': kind,
       'instance': instance,
       'weeks': weeks?.map((e) => e.toJson()).toList(),
+      'groupName': groupName, // Сохраните имя группы при сериализации
     };
   }
 }

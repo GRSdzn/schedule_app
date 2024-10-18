@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_app/app/router/main_router.dart';
@@ -22,7 +23,7 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<GetDataListBloc>(context).add(GetDataListEvent());
+    context.read<GetDataListBloc>().add(LoadDataListEvent());
   }
 
   List<GroupListData> search(List<GroupListData> groups) {
@@ -32,7 +33,7 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
   }
 
   Future<void> updateList() async {
-    BlocProvider.of<GetDataListBloc>(context).add(GetDataListEvent());
+    context.read<GetDataListBloc>().add(UpdateDataListEvent());
   }
 
   @override
@@ -67,7 +68,7 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
           if (state is GetDataListBlocLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is GetDataListBlocLoaded) {
-            final filteredList = search(state.groupsAndTeacherList);
+            final filteredList = search(state.data);
             return RefreshIndicator(
               onRefresh: updateList,
               child: ListView.builder(
@@ -78,16 +79,22 @@ class LaunchSplashScreenState extends State<LaunchSplashScreen> {
                     onTap: () async {
                       try {
                         await preferencesService.saveSelectedGroup(group.name);
-                        print('Сохранена группа: ${group.name}');
+                        if (kDebugMode) {
+                          print('Сохранена группа: ${group.name}');
+                        }
 
                         // Проверяем, что группа сохранилась
                         String? savedGroup =
                             await preferencesService.loadSelectedGroup();
-                        print('Загруженная группа: $savedGroup');
+                        if (kDebugMode) {
+                          print('Загруженная группа: $savedGroup');
+                        }
 
                         goRouter.push('/schedule');
                       } catch (e) {
-                        print('Ошибка при сохранении группы: $e');
+                        if (kDebugMode) {
+                          print('Ошибка при сохранении группы: $e');
+                        }
                       }
                     },
                     title: Text(

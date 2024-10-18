@@ -11,13 +11,10 @@ final class GetDataListBlocInitial extends GetDataListBlocState {}
 
 final class GetDataListBlocLoading extends GetDataListBlocState {}
 
-final class GetDataListBlocLoaded extends GetDataListBlocState {
-  // список всех групп и преподавателей
-  final List<GroupListData> groupsAndTeacherList;
-  const GetDataListBlocLoaded(this.groupsAndTeacherList);
+class GetDataListBlocLoaded extends GetDataListBlocState {
+  final List<GroupListData> data;
 
-  @override
-  List<Object> get props => [groupsAndTeacherList];
+  const GetDataListBlocLoaded(this.data);
 }
 
 final class GetDataListBlocError extends GetDataListBlocState {
